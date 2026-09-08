@@ -3,7 +3,7 @@ name: Base CI
 on:
   push:
     branches:
-      - maintenance/**
+      - "*"
   pull_request:
     branches:
       - main
