@@ -31,8 +31,8 @@ class GFDL(BaseEstimator):
         activation: str = "identity",
         weight_scheme: str = "uniform",
         direct_links: bool = True,
-        seed: int = None,
-        reg_alpha: float = None,
+        seed: int | None = None,
+        reg_alpha: float | None = None,
         rtol: float | None = None,
     ):
         self.hidden_layer_sizes = hidden_layer_sizes
@@ -381,9 +381,9 @@ class GFDLClassifier(ClassifierMixin, GFDL):
         activation: str = "identity",
         weight_scheme: str = "uniform",
         direct_links: bool = True,
-        seed: int = None,
-        reg_alpha: float = None,
-        rtol: float = None
+        seed: int | None = None,
+        reg_alpha: float | None = None,
+        rtol: float | None = None
     ):
         super().__init__(hidden_layer_sizes=hidden_layer_sizes,
                        activation=activation,
@@ -546,8 +546,8 @@ class EnsembleGFDL(BaseEstimator):
         hidden_layer_sizes: np.typing.ArrayLike = (100,),
         activation: str = "identity",
         weight_scheme: str = "uniform",
-        seed: int = None,
-        reg_alpha: float = None,
+        seed: int | None = None,
+        reg_alpha: float | None = None,
         rtol: float | None = None,
     ):
         self.hidden_layer_sizes = hidden_layer_sizes
@@ -844,9 +844,9 @@ class EnsembleGFDLClassifier(ClassifierMixin, EnsembleGFDL):
         hidden_layer_sizes: np.typing.ArrayLike = (100,),
         activation: str = "identity",
         weight_scheme: str = "uniform",
-        seed: int = None,
-        reg_alpha: float = None,
-        rtol: float = None,
+        seed: int | None = None,
+        reg_alpha: float | None = None,
+        rtol: float | None = None,
         voting: str = "soft",    # "soft" or "hard"
     ):
         super().__init__(hidden_layer_sizes=hidden_layer_sizes,
@@ -1164,8 +1164,8 @@ class GFDLRegressor(RegressorMixin, MultiOutputMixin, GFDL):
         activation: str = "identity",
         weight_scheme: str = "uniform",
         direct_links: bool = True,
-        seed: int = None,
-        reg_alpha: float = None,
+        seed: int | None = None,
+        reg_alpha: float | None = None,
         rtol: float | None = None,
     ):
         super().__init__(hidden_layer_sizes=hidden_layer_sizes,

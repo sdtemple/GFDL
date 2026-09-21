@@ -176,7 +176,7 @@ def test_against_shi2021(Classifier, target):
 
     # Shi et al. used half of the titanic dataset to tune
     # so I assumed they did the same for this dataset
-    X_tune, X_eval, y_tune, y_eval = train_test_split(
+    _, X_eval, _, y_eval = train_test_split(
         X, y, test_size=0.5, random_state=0)
 
     # Shi et al. used 4 folds on the titanic dataset
@@ -249,7 +249,7 @@ def test_soft_and_hard():
                                n_informative=8,
                                random_state=0)
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2,
+    X_train, X_test, y_train, _ = train_test_split(X, y, test_size=0.2,
                                                         random_state=0)
 
     model = EnsembleGFDLClassifier(
@@ -279,7 +279,7 @@ def test_hard_vote_proba_error():
                                n_classes=3,
                                n_informative=8,
                                random_state=0)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2,
+    X_train, X_test, y_train, _ = train_test_split(X, y, test_size=0.2,
                                                         random_state=0)
     model = EnsembleGFDLClassifier(
         hidden_layer_sizes=(5, 5, 5),
@@ -303,7 +303,7 @@ def test_soft_and_hard_can_differ(alpha):
                                n_informative=8,
                                random_state=0)
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2,
+    X_train, X_test, y_train, _ = train_test_split(X, y, test_size=0.2,
                                                         random_state=0)
 
     # adding more layers (heads) increases the chance of disagreement
