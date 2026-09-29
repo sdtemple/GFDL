@@ -512,6 +512,7 @@ class GFDLClassifier(ClassifierMixin, GFDL):
         X, Y = validate_data(self, X, y,
                              dtype=[xp.float64, xp.float32])
         self.classes_ = unique_labels(Y)
+        Y = _to_numpy_cpu_y(Y)
 
         # onehot y
         # (this is necessary for everything beyond binary classification)
@@ -616,7 +617,8 @@ class GFDLClassifier(ClassifierMixin, GFDL):
         X = validate_data(self, X, reset=False,
                           dtype=[xp.float64, xp.float32])
         out = self.predict_proba(X)
-        y_hat = self.classes_[np.argmax(out, axis=1)]
+        xp, _, _device = get_namespace_and_device(self.coeff_)
+        y_hat = self.classes_[xp.argmax(out, axis=1)]
         return y_hat
 
     def predict_proba(self, X):
@@ -640,7 +642,8 @@ class GFDLClassifier(ClassifierMixin, GFDL):
         X = validate_data(self, X, reset=False,
                           dtype=[xp.float64, xp.float32])
         out = super().predict(X)
-        out = np.exp(out - logsumexp(out, axis=1, keepdims=True))
+        xp, _, _device = get_namespace_and_device(self.coeff_)
+        out = xp.exp(out - scipy.special.logsumexp(out, axis=1, keepdims=True))
         return out
 
 
