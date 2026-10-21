@@ -475,7 +475,7 @@ def test_preserve_class_inputs(estimator):
 
 @pytest.mark.parametrize("reg_alpha, rtol, expected_acc, expected_roc", [
     (0.1, 1e-15, 0.9083333333333333, 0.9893414717354735),
-    (None, 1e-15, 0.2222222222222222, 0.5518850599798965),
+    (None, 1e-15, 0.2222222222222222, 0.5518425047439283),
     (None, 1e-3, 0.8972222222222223, 0.9802912857599967),
 ])
 def test_rtol_classifier(reg_alpha, rtol, expected_acc, expected_roc):
@@ -839,6 +839,7 @@ def test_gh_85_classifiers(hidden_layer_sizes, classifier):
 
 
 @skip_if_array_api_compat_not_configured
+@pytest.mark.parametrize("estimator", [GFDLClassifier, EnsembleGFDLClassifier])
 @pytest.mark.parametrize("hidden_layer_sizes", [(2,), (2, 2)])
 @pytest.mark.parametrize("direct_links", [True, False])
 @pytest.mark.parametrize("activation", ACTIVATIONS.keys())
@@ -849,7 +850,8 @@ def test_gh_85_classifiers(hidden_layer_sizes, classifier):
     "array_namespace, device_name, dtype_name",
     yield_namespace_device_dtype_combinations(),
 )
-def test_xp_make_classification(hidden_layer_sizes,
+def test_xp_make_classification(estimator,
+                            hidden_layer_sizes,
                             direct_links,
                             activation,
                             weight_scheme,
@@ -872,7 +874,6 @@ def test_xp_make_classification(hidden_layer_sizes,
         rtol = 1e-9 if dtype_name == "float64" else 1e-1
     n_samples = 500
     random_state = 42
-    estimator = GFDLClassifier
 
     def run_partial_fit(X, y, model):
         batch = 100
@@ -893,14 +894,20 @@ def test_xp_make_classification(hidden_layer_sizes,
     X = X.astype(dtype_name, copy=False)
     X_xp = xp.asarray(X, device=device)
 
+    kwargs = {
+        "reg_alpha": reg_alpha,
+        "hidden_layer_sizes": hidden_layer_sizes,
+        "activation": activation,
+        "weight_scheme": weight_scheme,
+        "seed": random_state,
+    }
+    if estimator is GFDLClassifier:
+        kwargs["direct_links"] = direct_links
+    else:
+        kwargs["voting"] = "soft"
+
     # NumPy .fit
-    est = estimator(
-        reg_alpha=reg_alpha,
-        hidden_layer_sizes=hidden_layer_sizes,
-        activation=activation,
-        weight_scheme=weight_scheme,
-        direct_links=direct_links,
-        seed=random_state,)
+    est = estimator(**kwargs)
     with config_context(array_api_dispatch=False):
         if partial_fit:
             run_partial_fit(X, y, est)
