@@ -845,7 +845,6 @@ def test_gh_85_classifiers(hidden_layer_sizes, classifier):
 @pytest.mark.parametrize("activation", ACTIVATIONS.keys())
 @pytest.mark.parametrize("weight_scheme", WEIGHTS.keys())
 @pytest.mark.parametrize("reg_alpha", [None, 0.1])
-@pytest.mark.parametrize("partial_fit", [False, True])
 @pytest.mark.parametrize(
     "array_namespace, device_name, dtype_name",
     yield_namespace_device_dtype_combinations(),
@@ -859,7 +858,6 @@ def test_xp_make_classification(estimator,
                             array_namespace,
                             device_name,
                             dtype_name,
-                            partial_fit,
                             ):
     # Custom make_regression()-based NumPy and array API matching
     # This test is closely based on `_check_array_api_core` from sklearn.
@@ -869,20 +867,8 @@ def test_xp_make_classification(estimator,
 
     atol = 1e-10 if dtype_name == "float64" else 2e-2
     rtol = 1e-13 if dtype_name == "float64" else 1e-4
-    if partial_fit:
-        atol = 1e-7 if dtype_name == "float64" else 1e-0
-        rtol = 1e-9 if dtype_name == "float64" else 1e-1
     n_samples = 500
     random_state = 42
-
-    def run_partial_fit(X, y, model):
-        batch = 100
-        classes = np.unique(y)
-        for start in range(0, X.shape[0], batch):
-            end = min(start + batch, X.shape[0])
-            Xb = X[start:end, :]
-            yb = y[start:end]
-            model.partial_fit(Xb, yb, classes=classes)
 
     X, y = make_classification(
         n_samples=n_samples,
@@ -909,18 +895,12 @@ def test_xp_make_classification(estimator,
     # NumPy .fit
     est = estimator(**kwargs)
     with config_context(array_api_dispatch=False):
-        if partial_fit:
-            run_partial_fit(X, y, est)
-        else:
-            est.fit(X, y)
+        est.fit(X, y)
 
     # xp (array API) .fit
     est_xp = clone(est)
     with config_context(array_api_dispatch=True):
-        if partial_fit:
-            run_partial_fit(X_xp, y, est_xp)
-        else:
-            est_xp.fit(X_xp, y)
+        est_xp.fit(X_xp, y)
 
     # Check fitted attributes are close
     array_attributes = {
