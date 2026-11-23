@@ -241,7 +241,11 @@ def test_against_shi2021(Classifier, target):
     assert acc == pytest.approx(target, rel=1e-4, abs=0)
 
 
-def test_soft_and_hard():
+def test_soft_and_hard_single_layer_match():
+    # with a single layer there is only one ensemble member, so
+    # "soft" (mean of probabilities) and "hard" (majority vote)
+    # aggregation are mathematically identical
+    # see: gh-161
     N, d = 60, 10
     X, y = make_classification(n_samples=N,
                                n_features=d,
@@ -253,7 +257,7 @@ def test_soft_and_hard():
                                                         random_state=0)
 
     model = EnsembleGFDLClassifier(
-        hidden_layer_sizes=(5, 5, 5),
+        hidden_layer_sizes=(5,),
         activation="tanh",
         weight_scheme="uniform",
         seed=0,
